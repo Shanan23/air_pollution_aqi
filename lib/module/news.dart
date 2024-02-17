@@ -56,6 +56,9 @@ class NewsScreen extends StatelessWidget {
       case 2:
         Get.offAndToNamed(RouteName.news);
         break;
+      case 3:
+        Get.offAndToNamed(RouteName.about);
+        break;
     }
   }
 
@@ -135,6 +138,11 @@ class NewsScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       // Open the news article in a web browser or navigate to a WebView.
+                      if (news.url != null) {
+                        newsController.initialUrl.value = news.url!;
+                        newsController.webViewNews(news.url!);
+                        Get.toNamed(RouteName.newsd);
+                      }
                     },
                     child: Text(
                       'Read more...',

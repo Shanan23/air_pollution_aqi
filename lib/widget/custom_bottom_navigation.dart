@@ -12,6 +12,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      selectedItemColor: Colors.green, // Custom color for selected item
+      unselectedItemColor: Colors.grey,
+      showUnselectedLabels: true,
+      unselectedLabelStyle: TextStyle(color: Colors.grey),
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
@@ -24,6 +28,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.article),
           label: 'News',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.info_outline),
+          label: 'About',
         ),
       ],
       currentIndex: currentIndex,

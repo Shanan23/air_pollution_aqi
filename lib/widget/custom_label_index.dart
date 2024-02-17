@@ -40,15 +40,17 @@ class CustomLabelIndex extends StatelessWidget {
                   children: [
                     Text(
                       pollutan,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color:
+                            (desc == "Moderate") ? Colors.black : Colors.white,
                         fontSize: 18,
                       ),
                     ),
-                    const Text(
+                    Text(
                       "AQI",
                       style: TextStyle(
-                        color: Colors.white,
+                        color:
+                            (desc == "Moderate") ? Colors.black : Colors.white,
                         fontSize: 18,
                       ),
                     ),
@@ -82,8 +84,8 @@ class CustomLabelIndex extends StatelessWidget {
                   ),
                   Text(
                     desc,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: (desc == "Moderate") ? Colors.black : Colors.white,
                       fontSize: 16,
                     ),
                   ),

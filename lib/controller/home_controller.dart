@@ -8,14 +8,24 @@ import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   RxList<BarChartGroupData> barData = <BarChartGroupData>[].obs;
-  Rx<AqiUIObject> aqiUiObject = AqiUIObject(description: "", image: "assets/icons/ic_face_happy.png").obs;
+  Rx<AqiUIObject> aqiUiObject = AqiUIObject(
+          description: "",
+          image: "assets/icons/ic_face_happy.png",
+          image1: "assets/icons/ic_dark_red_1.png",
+          image2: "assets/icons/ic_dark_red_2.png",
+          image3: "assets/icons/ic_dark_red_3.png",
+          image4: "assets/icons/ic_dark_red_4.png",
+          lblImage1: '',
+          lblImage2: '',
+          lblImage3: '',
+          lblImage4: 'Avoid all physical activity outdoors.')
+      .obs;
   final MapsController mapController = Get.find();
-  final AqiController aqiController = Get.put(AqiController());
+  final AqiController aqiController = Get.find();
 
   @override
   void onInit() {
     super.onInit();
-    getCurrentLocationAqi();
   }
 
   void initData(double barsSpace, double barsWidth) {
@@ -23,277 +33,75 @@ class HomeController extends GetxController {
     barData.assignAll(data);
   }
 
-  final Color dark = Colors.red;
-  final Color normal = Colors.orange;
-  final Color light = Colors.yellow;
-
   Future<void> getCurrentLocationAqi() async {
     var lat = mapController.latitude.value;
     var long = mapController.longitude.value;
 
-    var cityData =
-        await aqiController.getAqiData(lat.toString(), long.toString());
-    if (cityData?.status != "success") {
+    // var cityData =
+    //     await aqiController.getAqiDatawaqi(lat.toString(), long.toString());
+    var cityDataWaqi = await aqiController.getAqiDataWaqi(
+        lat.toString(), long.toString(), true);
+    print("cityDataWaqi : $cityDataWaqi");
+
+    if (cityDataWaqi != null) {
+      aqiController.nearestCityDataWaqi.value = cityDataWaqi;
+    }
+    // if (cityDataWaqi?.status != "success") {
+    //   return;
+    // }
+    if (cityDataWaqi?.status != "ok") {
       return;
     }
-    var customAqi =
-        getAqiObject(cityData?.data?.current?.pollution?.aqius ?? 0);
+    // var customAqi =
+    //     getAqiObject(cityData?.data?.current?.pollution?.aqius ?? 0);
+
+    var customAqi = getAqiObject(cityDataWaqi?.data?.aqi ?? 0);
 
     aqiUiObject.value = customAqi;
   }
 
   List<BarChartGroupData> getData(double barsWidth, double barsSpace) {
-    return [
-      BarChartGroupData(
-        x: 0,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 170,
-            rodStackItems: [
-              BarChartRodStackItem(0, 20, dark),
-              BarChartRodStackItem(20, 120, normal),
-              BarChartRodStackItem(120, 170, light),
+    print(
+        "getData Chart : ${aqiController.nearestCityDataWaqi.value.data?.city?.name}");
+    return aqiController.nearestCityDataWaqi.value.data?.forecast?.daily?.pm10
+            ?.map((data) {
+          final double avg = data.avg?.toDouble() ?? 0.0;
+          var customAqi = getAqiObject(avg.toInt());
+
+          print("avg : $avg");
+          final int index = aqiController
+                  .nearestCityDataWaqi.value.data?.forecast?.daily?.pm10
+                  ?.indexOf(data) ??
+              0;
+
+          return BarChartGroupData(
+            x: index,
+            barsSpace: barsSpace,
+            barRods: [
+              BarChartRodData(
+                toY: avg,
+                rodStackItems: [
+                  BarChartRodStackItem(
+                      0, avg, customAqi.lightColor ?? Colors.blue),
+                ],
+                borderRadius: BorderRadius.zero,
+                width: barsWidth,
+              ),
             ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 240,
-            rodStackItems: [
-              BarChartRodStackItem(0, 130, dark),
-              BarChartRodStackItem(130, 140, normal),
-              BarChartRodStackItem(140, 240, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 230.5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 60.5, dark),
-              BarChartRodStackItem(60.5, 180, normal),
-              BarChartRodStackItem(180, 230.5, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 290,
-            rodStackItems: [
-              BarChartRodStackItem(0, 90, dark),
-              BarChartRodStackItem(90, 150, normal),
-              BarChartRodStackItem(150, 290, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 320,
-            rodStackItems: [
-              BarChartRodStackItem(0, 20.5, dark),
-              BarChartRodStackItem(20.5, 170.5, normal),
-              BarChartRodStackItem(170.5, 320, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
-      ),
-      BarChartGroupData(
-        x: 1,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 310,
-            rodStackItems: [
-              BarChartRodStackItem(0, 110, dark),
-              BarChartRodStackItem(110, 180, normal),
-              BarChartRodStackItem(180, 310, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 350,
-            rodStackItems: [
-              BarChartRodStackItem(0, 140, dark),
-              BarChartRodStackItem(140, 270, normal),
-              BarChartRodStackItem(270, 350, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 310,
-            rodStackItems: [
-              BarChartRodStackItem(0, 80, dark),
-              BarChartRodStackItem(80, 240, normal),
-              BarChartRodStackItem(240, 310, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 150,
-            rodStackItems: [
-              BarChartRodStackItem(0, 60.5, dark),
-              BarChartRodStackItem(60.5, 120.5, normal),
-              BarChartRodStackItem(120.5, 150, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 170,
-            rodStackItems: [
-              BarChartRodStackItem(0, 90, dark),
-              BarChartRodStackItem(90, 150, normal),
-              BarChartRodStackItem(150, 170, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
-      ),
-      BarChartGroupData(
-        x: 2,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 340,
-            rodStackItems: [
-              BarChartRodStackItem(0, 60, dark),
-              BarChartRodStackItem(60, 230, normal),
-              BarChartRodStackItem(230, 340, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 320,
-            rodStackItems: [
-              BarChartRodStackItem(0, 70, dark),
-              BarChartRodStackItem(70, 240, normal),
-              BarChartRodStackItem(240, 320, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 140.5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 10.5, dark),
-              BarChartRodStackItem(10.5, 120, normal),
-              BarChartRodStackItem(120, 140.5, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 200,
-            rodStackItems: [
-              BarChartRodStackItem(0, 40, dark),
-              BarChartRodStackItem(40, 150, normal),
-              BarChartRodStackItem(150, 200, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 240,
-            rodStackItems: [
-              BarChartRodStackItem(0, 40, dark),
-              BarChartRodStackItem(40, 150, normal),
-              BarChartRodStackItem(150, 240, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
-      ),
-      BarChartGroupData(
-        x: 3,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 140,
-            rodStackItems: [
-              BarChartRodStackItem(0, 10.5, dark),
-              BarChartRodStackItem(10.5, 120, normal),
-              BarChartRodStackItem(120, 140, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 270,
-            rodStackItems: [
-              BarChartRodStackItem(0, 70, dark),
-              BarChartRodStackItem(70, 250, normal),
-              BarChartRodStackItem(250, 270, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 290,
-            rodStackItems: [
-              BarChartRodStackItem(0, 60, dark),
-              BarChartRodStackItem(60, 230, normal),
-              BarChartRodStackItem(230, 290, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 160.5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 90, dark),
-              BarChartRodStackItem(90, 150, normal),
-              BarChartRodStackItem(150, 160.5, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 150,
-            rodStackItems: [
-              BarChartRodStackItem(0, 70, dark),
-              BarChartRodStackItem(70, 120.5, normal),
-              BarChartRodStackItem(120.5, 150, light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
-      ),
-    ];
+          );
+        }).toList() ??
+        [];
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    const style = TextStyle(fontSize: 10);
+    const style = TextStyle(fontSize: 8);
     String text;
-    switch (value.toInt()) {
-      case 0:
-        text = 'Apr';
-        break;
-      case 1:
-        text = 'May';
-        break;
-      case 2:
-        text = 'Jun';
-        break;
-      case 3:
-        text = 'Jul';
-        break;
-      case 4:
-        text = 'Aug';
-        break;
-      default:
-        text = '';
-        break;
-    }
+
+    // Extracting the month abbreviation from the date
+    final date =
+        DateTime.parse('2024-02-14').add(Duration(days: value.toInt()));
+    text = "${date.day}";
+
     return SideTitleWidget(
       axisSide: meta.axisSide,
       child: Text(text, style: style),
@@ -305,7 +113,7 @@ class HomeController extends GetxController {
       return Container();
     }
     const style = TextStyle(
-      fontSize: 10,
+      fontSize: 8,
     );
     return SideTitleWidget(
       axisSide: meta.axisSide,
