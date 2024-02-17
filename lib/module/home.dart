@@ -19,7 +19,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     homeController.getCurrentLocationAqi();
-    mapController.getLocation();
     return Scaffold(
       body: SingleChildScrollView(
         child: Obx(
@@ -106,9 +105,7 @@ class HomeScreen extends StatelessWidget {
                       var currentLocation = CurrentLocation(
                           mapController.latitude.value,
                           mapController.longitude.value);
-                      mapController.getAqiData(currentLocation, true);
-
-                      Get.toNamed(RouteName.aqi);
+                      Get.toNamed(RouteName.aqi, arguments: currentLocation);
                     },
                     child: CustomLabelIndex(
                       pollutan: aqiController

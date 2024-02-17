@@ -3,6 +3,7 @@ import 'package:air_pollution_application/controller/home_controller.dart';
 import 'package:air_pollution_application/controller/maps_controller.dart';
 import 'package:air_pollution_application/controller/news_controller.dart';
 import 'package:air_pollution_application/module/about.dart';
+import 'package:air_pollution_application/module/about_detail.dart';
 import 'package:air_pollution_application/module/aqi_detail.dart';
 import 'package:air_pollution_application/module/home.dart';
 import 'package:air_pollution_application/module/maps.dart';
@@ -19,6 +20,7 @@ class RouteName {
   static const news = '/news';
   static const newsd = '/newsd';
   static const about = '/about';
+  static const aboutd = '/aboutd';
   static const aqi = '/aqi';
 }
 
@@ -71,5 +73,9 @@ final List<GetPage> routeApp = [
   GetPage(
     name: RouteName.about,
     page: () => AboutScreen(),
+  ),
+  GetPage(
+    name: RouteName.aboutd,
+    page: () => AboutDetailScreen(),
   ),
 ];

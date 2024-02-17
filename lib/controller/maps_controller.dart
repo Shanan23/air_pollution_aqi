@@ -103,6 +103,10 @@ class MapsController extends GetxController {
     if (isPublic) {
       aqiUiObject.value = customAqi;
     }
+    print("mapscontroller getAqiData aqi: ${cityDataWaqi?.data?.aqi}");
+    print("mapscontroller getAqiData cityDataWaqi: $cityDataWaqi");
+    print("mapscontroller getAqiData customAqi: $customAqi");
+    print("mapscontroller getAqiData isPublic: $isPublic");
     return cityDataWaqi;
   }
 

@@ -2,6 +2,7 @@ import 'package:air_pollution_application/controller/aqi_controller.dart';
 import 'package:air_pollution_application/controller/home_controller.dart';
 import 'package:air_pollution_application/controller/maps_controller.dart';
 import 'package:air_pollution_application/model/aqi_ui.dart';
+import 'package:air_pollution_application/model/current_location.dart';
 import 'package:air_pollution_application/router/route.dart';
 import 'package:air_pollution_application/widget/circle_with_text.dart';
 import 'package:air_pollution_application/widget/custom_bottom_navigation.dart';
@@ -15,9 +16,12 @@ class AqiScreen extends StatelessWidget {
   final MapsController mapsController = Get.find();
   final HomeController homeController = Get.find();
   final AqiController aqiController = Get.find();
+  CurrentLocation objMap = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
+    mapsController.getAqiData(objMap, true);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

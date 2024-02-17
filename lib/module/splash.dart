@@ -11,6 +11,8 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    mapController.getLocation();
+
     Future.delayed(const Duration(seconds: 3), () {
       // Navigating to the home screen after 3 seconds using Get.offAndToNamed
       Get.offAndToNamed(RouteName.home);

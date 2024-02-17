@@ -35,8 +35,16 @@ class AqiController extends GetxController {
       String lat, String long, bool isPublic) async {
     WaqiResponse? cityData;
     try {
+      if (lat == "0.0" && long == "0.0") {
+        throw Exception("0.0 lat long");
+      }
       cityData = await aqiService.getAqiNearestWaqi(lat, long);
-      if (isPublic) nearestCityDataWaqi.value = cityData;
+      if (isPublic) {
+        nearestCityDataWaqi.value = cityData;
+        nearestCityDataWaqi.update((val) {
+          nearestCityDataWaqi.value = cityData!;
+        });
+      }
     } catch (error) {
       print('Error fetching city data Waqi: $error');
     }

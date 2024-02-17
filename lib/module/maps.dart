@@ -321,15 +321,13 @@ class MapsScreen extends StatelessWidget {
                       print("submited : $data");
                       var index = mapController.suggestions.indexOf(data);
                       var objMap = mapController.allLocations[index];
-                      mapController.getAqiData(objMap, true);
-                      Get.toNamed(RouteName.aqi);
+                      Get.toNamed(RouteName.aqi, arguments: objMap);
                     },
                     itemSubmitted: (item) {
                       print("submited : $item");
                       var index = mapController.suggestions.indexOf(item);
                       var objMap = mapController.allLocations[index];
-                      mapController.getAqiData(objMap, true);
-                      Get.toNamed(RouteName.aqi);
+                      Get.toNamed(RouteName.aqi, arguments: objMap);
                     },
                     submitOnSuggestionTap: true,
                     itemBuilder: (context, item) {
