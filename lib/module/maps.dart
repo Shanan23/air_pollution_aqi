@@ -303,7 +303,7 @@ class MapsScreen extends StatelessWidget {
                     suggestions: mapController.suggestions,
                     decoration: const InputDecoration(
                       hintText: "Type a city",
-                      labelText: "City",
+                      labelText: "Search",
                       filled: true,
                       fillColor: Colors.white, // Background color
                       border: OutlineInputBorder(
