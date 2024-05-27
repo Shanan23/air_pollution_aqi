@@ -255,7 +255,7 @@ class MapsScreen extends StatelessWidget {
             children: [
               Text(
                 customAqi.description,
-                style: TextStyle(fontSize: 22, color: Colors.black),
+                style: TextStyle(fontSize: 18, color: Colors.black),
               ),
               Align(
                 alignment: Alignment.center,
