@@ -19,6 +19,8 @@ class MapsController extends GetxController {
   RxDouble longitude = 0.0.obs;
   Location location = Location();
   RxList<String> suggestions = [""].obs;
+  bool _serviceEnabled = false;
+  PermissionStatus _permissionGranted = PermissionStatus.denied;
 
   final List<LatLongWithAqi> points =
       [LatLongWithAqi(LatLng(-6.211544, 106.845172), 0)].obs;
@@ -66,7 +68,7 @@ class MapsController extends GetxController {
         allLocations.add(CurrentLocation(latitude, longitude));
       });
 
-      double maxDistance = 30.0; // Maximum distance in kilometers
+      double maxDistance = 10.0; // Maximum distance in kilometers
 
       List<CurrentLocation> nearestLocations = findNearestLocations(
           CurrentLocation(latitude.value, longitude.value),
@@ -117,6 +119,22 @@ class MapsController extends GetxController {
 
   Future<void> getLocation() async {
     try {
+      _serviceEnabled = await location.serviceEnabled();
+      if (!_serviceEnabled) {
+        _serviceEnabled = await location.requestService();
+        if (!_serviceEnabled) {
+          return;
+        }
+      }
+
+      _permissionGranted = await location.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await location.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {
+          return;
+        }
+      }
+
       var currentLocation = await location.getLocation();
       latitude.value = currentLocation.latitude!;
       longitude.value = currentLocation.longitude!;

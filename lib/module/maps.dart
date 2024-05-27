@@ -25,7 +25,7 @@ class MapsScreen extends StatelessWidget {
             FlutterMap(
               options: const MapOptions(
                 initialCenter: const LatLng(-6.211544, 106.845172),
-                initialZoom: 10.0,
+                initialZoom: 13.0,
               ),
               children: [
                 TileLayer(

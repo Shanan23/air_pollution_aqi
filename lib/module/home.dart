@@ -134,7 +134,7 @@ class HomeScreen extends StatelessWidget {
                             height: 60,
                           ),
                           SizedBox(
-                            width: 50,
+                            width: 30,
                           ),
                           Image.asset(
                             homeController.aqiUiObject.value
@@ -143,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                             height: 60,
                           ),
                           SizedBox(
-                            width: 50,
+                            width: 30,
                           ),
                           Image.asset(
                             homeController.aqiUiObject.value
@@ -152,7 +152,7 @@ class HomeScreen extends StatelessWidget {
                             height: 60,
                           ),
                           SizedBox(
-                            width: 50,
+                            width: 30,
                           ),
                           Image.asset(
                             homeController.aqiUiObject.value
