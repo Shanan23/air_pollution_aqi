@@ -1,7 +1,11 @@
 import 'package:air_pollution_application/common/color.dart';
 import 'package:air_pollution_application/controller/maps_controller.dart';
 import 'package:air_pollution_application/model/aqi_ui.dart';
+import 'package:air_pollution_application/model/current_location.dart';
+import 'package:air_pollution_application/model/lat_long_with_aqi.dart';
 import 'package:air_pollution_application/router/route.dart';
+import 'package:air_pollution_application/widget/circle_with_aqi.dart';
+import 'package:air_pollution_application/widget/circle_with_text.dart';
 import 'package:air_pollution_application/widget/custom_bottom_navigation.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter/material.dart';
@@ -13,19 +17,31 @@ class MapsScreen extends StatelessWidget {
   final MapsController mapController = Get.find();
   late AutoCompleteTextField searchTextField;
   GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
+  final MapController _mapController =
+      MapController(); // Initialize the MapController
 
   @override
   Widget build(BuildContext context) {
     // mapController.getLocation();
+
+    mapController.selectedLatLong.listen((latLng) {
+      _mapController.move(latLng, mapController.zoom.value);
+    });
 
     return Scaffold(
       body: Stack(
         children: [
           Obx(
             () => FlutterMap(
+              mapController: _mapController, // Use the MapController
               options: MapOptions(
                 initialCenter: mapController.selectedLatLong.value,
-                initialZoom: 8.0,
+                initialZoom: mapController.zoom.value,
+                onTap: (tapPosition, point) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  mapController.setSelectedLatLng(mapController.latitude.value,
+                      mapController.longitude.value, 8.0);
+                },
               ),
               children: [
                 TileLayer(
@@ -54,221 +70,57 @@ class MapsScreen extends StatelessWidget {
                         point: point.latLng,
                         child: GestureDetector(
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                padding: const EdgeInsets.all(0),
-                                backgroundColor: Colors
-                                    .transparent, // Set background color to transparent
-                                content: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10))),
-                                    child: Column(
-                                      children: [
-                                        const ListTile(
-                                          textColor: Colors.black,
-                                          title: Text('What is AQI?'),
-                                          subtitle: Text(
-                                              'The Air Quality Index was created as a simple way for us to understand the quality of the air we breathe. It is easy, just remember the color:'),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          color: lightGreen,
-                                          child: Row(children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: Text(
-                                                "    0 - 50   ",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 50,
-                                              width: 1,
-                                            ),
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  "Good",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          color: lightYellow,
-                                          child: Row(children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: Text(
-                                                " 51 - 100 ",
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 50,
-                                              width: 1,
-                                            ),
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  "Moderate",
-                                                  style: TextStyle(
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          color: lightOrange,
-                                          child: Row(children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: Text(
-                                                "101 - 150",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 50,
-                                              width: 1,
-                                            ),
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  "Unhealthy for Group Sensitive",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          color: lightRed,
-                                          child: Row(children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: Text(
-                                                "151 - 200",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 50,
-                                              width: 1,
-                                            ),
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  "Unhealthy",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          color: lightPurple,
-                                          child: Row(children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: Text(
-                                                "201 - 300",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 50,
-                                              width: 1,
-                                            ),
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  "Very Unhealthy",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                        ),
-                                        Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          color: lightDanger,
-                                          child: Row(children: [
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 8.0,
-                                                  left: 8.0,
-                                                  right: 8.0),
-                                              child: Text(
-                                                "301 - 500",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                            Container(
-                                              color: Colors.white,
-                                              height: 50,
-                                              width: 1,
-                                            ),
-                                            const Center(
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                  "Hazardous",
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ]),
-                                        ),
-                                      ],
-                                    ),
+                            mapController.setSelectedLatLng(
+                                point.latLng.latitude,
+                                point.latLng.longitude,
+                                15.0);
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                            final snackBar = SnackBar(
+                              padding: const EdgeInsets.all(0),
+                              backgroundColor: Colors.transparent,
+                              content: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10))),
+                                  child: Column(
+                                    children: _buildAqiDetail(
+                                        context, point, customAqi),
                                   ),
                                 ),
                               ),
                             );
+
+                            // Show the Snackbar
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(
+                            //     padding: const EdgeInsets.all(0),
+                            //     backgroundColor: Colors
+                            //         .transparent, // Set background color to transparent
+                            //     content: Padding(
+                            //       padding: const EdgeInsets.only(
+                            //           left: 20, right: 20),
+                            //       child: Container(
+                            //         decoration: const BoxDecoration(
+                            //             color: Colors.white,
+                            //             borderRadius: BorderRadius.only(
+                            //                 topLeft: Radius.circular(10),
+                            //                 topRight: Radius.circular(10))),
+                            //         child: Column(
+                            //           children: _buildAqiLegend(),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // );
                           },
                           child: Column(
                             children: [
@@ -324,16 +176,16 @@ class MapsScreen extends StatelessWidget {
                     var objMap = mapController.allLocations[index];
 
                     mapController.setSelectedLatLng(
-                        objMap.latitude, objMap.longitude);
+                        objMap.latitude, objMap.longitude, 8.0);
                     // Get.toNamed(RouteName.aqi, arguments: objMap);
                   },
                   itemSubmitted: (item) {
                     print("submited : $item");
                     var index = mapController.suggestions.indexOf(item);
                     var objMap = mapController.allLocations[index];
-                    
+
                     mapController.setSelectedLatLng(
-                        objMap.latitude, objMap.longitude);
+                        objMap.latitude, objMap.longitude, 8.0);
                     // Get.toNamed(RouteName.aqi, arguments: objMap);
                   },
                   submitOnSuggestionTap: true,
@@ -360,6 +212,166 @@ class MapsScreen extends StatelessWidget {
         onTap: (index) {
           handleNavigation(index);
         },
+      ),
+    );
+  }
+
+  List<Widget> _buildAqiDetail(
+      context, LatLongWithAqi point, AqiUIObject customAqi) {
+    return [
+      Container(
+        width: double.infinity,
+        height: 50,
+        color: backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                point.name,
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
+              GestureDetector(
+                child: Icon(Icons.arrow_forward),
+                onTap: () {
+                  CurrentLocation currentLocation = CurrentLocation(
+                      point.latLng.latitude, point.latLng.longitude);
+                  Get.toNamed(RouteName.aqi, arguments: currentLocation);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      Container(
+        width: double.infinity,
+        height: 50,
+        color: backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                customAqi.description,
+                style: TextStyle(fontSize: 22, color: Colors.black),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: CircleWithAqi(
+                  pollutan: point.aqi.toString(),
+                  circleColor: customAqi.darkColor,
+                ),
+              ),
+              GestureDetector(
+                child: Icon(Icons.info),
+                onTap: () {
+                  final snackBar = SnackBar(
+                    padding: const EdgeInsets.all(0),
+                    backgroundColor: Colors.transparent,
+                    content: Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10))),
+                        child: Column(
+                          children: _buildAqiLegend(),
+                        ),
+                      ),
+                    ),
+                    duration:
+                        const Duration(days: 1), // Set to a very long duration
+                  );
+
+                  // Show the Snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 10,
+      ),
+      Container(
+        width: double.infinity,
+        height: 50,
+        color: backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Image.asset(
+                customAqi.image1, // Replace with your image path
+                width: 60,
+                height: 60,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  customAqi.lblImage1,
+                  style: TextStyle(fontSize: 12, color: Colors.black),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildAqiLegend() {
+    return [
+      const ListTile(
+        textColor: Colors.black,
+        title: Text('What is AQI?'),
+        subtitle: Text(
+            'The Air Quality Index was created as a simple way for us to understand the quality of the air we breathe. It is easy, just remember the color:'),
+      ),
+      const SizedBox(
+        height: 10,
+      ),
+      _buildAqiRow("    0 - 50   ", "Good", lightGreen, Colors.white),
+      _buildAqiRow(" 51 - 100 ", "Moderate", lightYellow, Colors.black),
+      _buildAqiRow("101 - 150", "Unhealthy for Group Sensitive", lightOrange,
+          Colors.white),
+      _buildAqiRow("151 - 200", "Unhealthy", lightRed, Colors.white),
+      _buildAqiRow("201 - 300", "Very Unhealthy", lightPurple, Colors.white),
+      _buildAqiRow("301 - 500", "Hazardous", lightDanger, Colors.white),
+    ];
+  }
+
+  Widget _buildAqiRow(String range, String description, Color backgroundColor,
+      Color textColor) {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      color: backgroundColor,
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              range,
+              style: TextStyle(color: textColor),
+            ),
+          ),
+          Container(color: Colors.white, height: 50, width: 1),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                description,
+                style: TextStyle(color: textColor),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

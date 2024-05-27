@@ -19,13 +19,14 @@ class MapsController extends GetxController {
   RxDouble longitude = 0.0.obs;
   var currentLatLong = const LatLng(0.0, 0.0).obs;
   var selectedLatLong = const LatLng(0.0, 0.0).obs;
+  var zoom = 8.0.obs;
   RxList<String> suggestions = [""].obs;
   Location location = Location();
   bool _serviceEnabled = false;
   PermissionStatus _permissionGranted = PermissionStatus.denied;
 
   final List<LatLongWithAqi> points =
-      [LatLongWithAqi(LatLng(-6.211544, 106.845172), 0)].obs;
+      [LatLongWithAqi(LatLng(-6.211544, 106.845172), 0, "")].obs;
   List<CurrentLocation> allLocations = [
     CurrentLocation(-6.211544, 106.845172),
     // Add more locations as needed
@@ -93,24 +94,25 @@ class MapsController extends GetxController {
 
   Future<void> getAqiFromDistance(selectedLat, selectedLng) async {
     double maxDistance = 100.0; // Maximum distance in kilometers
-    
+
     List<CurrentLocation> nearestLocations = findNearestLocations(
         CurrentLocation(selectedLat, selectedLng), allLocations, maxDistance);
-    
+
     print(
         "Nearest locations within $maxDistance km: ${selectedLat}, ${selectedLng}");
-    
+    points.clear();
     for (CurrentLocation location in nearestLocations) {
       WaqiResponse? cityDataWaqi = await getAqiData(location, false);
-    
-      points.add(LatLongWithAqi(LatLng(location.latitude, location.longitude),
-          cityDataWaqi?.data?.aqi?.toInt() ?? 0));
-    
-      print(
-          "Latitude: ${location.latitude}, Longitude: ${location.longitude}");
+
+      points.add(LatLongWithAqi(
+          LatLng(location.latitude, location.longitude),
+          cityDataWaqi?.data?.aqi?.toInt() ?? 0,
+          cityDataWaqi?.data?.city?.name ?? ""));
+
+      print("Latitude: ${location.latitude}, Longitude: ${location.longitude}");
       print("Aqi: ${cityDataWaqi?.data?.aqi}");
     }
-    
+
     // Now, your `points` list is updated with the points from the JSON file
     print(points);
   }
@@ -170,8 +172,9 @@ class MapsController extends GetxController {
     }
   }
 
-  Future<void> setSelectedLatLng(latitude, longitude) async {
+  Future<void> setSelectedLatLng(latitude, longitude, zoomValue) async {
     try {
+      zoom.value = zoomValue;
       selectedLatLong.value = LatLng(latitude, longitude);
       print("SelectedLocation location: ${latitude}, ${longitude}");
       await getAqiFromDistance(latitude, longitude);
