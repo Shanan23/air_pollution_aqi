@@ -48,16 +48,16 @@ class NewsScreen extends StatelessWidget {
     // Handle navigation based on index
     switch (index) {
       case 0:
-        Get.offAndToNamed(RouteName.home);
+        Get.toNamed(RouteName.home);
         break;
       case 1:
-        Get.offAndToNamed(RouteName.maps);
+        Get.toNamed(RouteName.maps);
         break;
       case 2:
-        Get.offAndToNamed(RouteName.news);
+        Get.toNamed(RouteName.news);
         break;
       case 3:
-        Get.offAndToNamed(RouteName.about);
+        Get.toNamed(RouteName.about);
         break;
     }
   }

@@ -74,7 +74,8 @@ flutter:
   assets:
     - assets/gif/
     - assets/icons/
-    - assets/latlongindonesia.json
+    - assets/regencies.json
+    - assets/cities.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

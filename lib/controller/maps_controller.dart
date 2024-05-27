@@ -17,8 +17,10 @@ class MapsController extends GetxController {
 
   RxDouble latitude = 0.0.obs;
   RxDouble longitude = 0.0.obs;
-  Location location = Location();
+  var currentLatLong = const LatLng(0.0, 0.0).obs;
+  var selectedLatLong = const LatLng(0.0, 0.0).obs;
   RxList<String> suggestions = [""].obs;
+  Location location = Location();
   bool _serviceEnabled = false;
   PermissionStatus _permissionGranted = PermissionStatus.denied;
 
@@ -49,11 +51,13 @@ class MapsController extends GetxController {
   Future<void> loadPointsFromJson() async {
     try {
       // Load the JSON file from the assets folder
-      String jsonString =
-          await rootBundle.loadString('assets/latlongindonesia.json');
+      String jsonString = await rootBundle.loadString('assets/regencies.json');
+      String jsonStringCities =
+          await rootBundle.loadString('assets/cities.json');
 
       // Parse the JSON data
       List<dynamic> jsonList = jsonDecode(jsonString);
+      List<dynamic> jsonListCities = jsonDecode(jsonStringCities);
       allLocations.clear();
       points.clear();
       suggestions.clear();
@@ -68,32 +72,47 @@ class MapsController extends GetxController {
         allLocations.add(CurrentLocation(latitude, longitude));
       });
 
-      double maxDistance = 10.0; // Maximum distance in kilometers
+      // Convert JSON data to LatLng objects and add to the list
+      jsonListCities.forEach((jsonPoint) {
+        print("country : ${jsonPoint['country']}");
 
-      List<CurrentLocation> nearestLocations = findNearestLocations(
-          CurrentLocation(latitude.value, longitude.value),
-          allLocations,
-          maxDistance);
+        if (jsonPoint['country'] == "SG" || jsonPoint['country'] == "MY") {
+          double latitude = double.parse(jsonPoint['lat']);
+          double longitude = double.parse(jsonPoint['lng']);
+          String name = jsonPoint['name'];
+          suggestions.add(name);
+          allLocations.add(CurrentLocation(latitude, longitude));
+        }
+      });
 
-      print(
-          "Nearest locations within $maxDistance km: ${latitude.value}, ${longitude.value}");
-
-      for (CurrentLocation location in nearestLocations) {
-        WaqiResponse? cityDataWaqi = await getAqiData(location, false);
-
-        points.add(LatLongWithAqi(LatLng(location.latitude, location.longitude),
-            cityDataWaqi?.data?.aqi?.toInt() ?? 0));
-
-        print(
-            "Latitude: ${location.latitude}, Longitude: ${location.longitude}");
-        print("Aqi: ${cityDataWaqi?.data?.aqi}");
-      }
-
-      // Now, your `points` list is updated with the points from the JSON file
-      print(points);
+      await getAqiFromDistance(latitude.value, longitude.value);
     } catch (e) {
       print("Error loading points from JSON: $e");
     }
+  }
+
+  Future<void> getAqiFromDistance(selectedLat, selectedLng) async {
+    double maxDistance = 100.0; // Maximum distance in kilometers
+    
+    List<CurrentLocation> nearestLocations = findNearestLocations(
+        CurrentLocation(selectedLat, selectedLng), allLocations, maxDistance);
+    
+    print(
+        "Nearest locations within $maxDistance km: ${selectedLat}, ${selectedLng}");
+    
+    for (CurrentLocation location in nearestLocations) {
+      WaqiResponse? cityDataWaqi = await getAqiData(location, false);
+    
+      points.add(LatLongWithAqi(LatLng(location.latitude, location.longitude),
+          cityDataWaqi?.data?.aqi?.toInt() ?? 0));
+    
+      print(
+          "Latitude: ${location.latitude}, Longitude: ${location.longitude}");
+      print("Aqi: ${cityDataWaqi?.data?.aqi}");
+    }
+    
+    // Now, your `points` list is updated with the points from the JSON file
+    print(points);
   }
 
   Future<WaqiResponse?> getAqiData(
@@ -114,6 +133,11 @@ class MapsController extends GetxController {
 
   // Method to check if a point is the current location
   LatLng getCurrentLocation() {
+    print(
+        "mapscontroller currentLocation: ${latitude.value}, ${longitude.value}");
+    currentLatLong.value = LatLng(latitude.value, longitude.value);
+    currentLatLong.refresh();
+    selectedLatLong = currentLatLong;
     return LatLng(latitude.value, longitude.value);
   }
 
@@ -139,8 +163,18 @@ class MapsController extends GetxController {
       latitude.value = currentLocation.latitude!;
       longitude.value = currentLocation.longitude!;
       print("Current location: ${latitude.value}, ${longitude.value}");
+      getCurrentLocation();
+      await getAqiFromDistance(latitude.value, longitude.value);
+    } catch (e) {
+      print('Error getting location: $e');
+    }
+  }
 
-      loadPointsFromJson();
+  Future<void> setSelectedLatLng(latitude, longitude) async {
+    try {
+      selectedLatLong.value = LatLng(latitude, longitude);
+      print("SelectedLocation location: ${latitude}, ${longitude}");
+      await getAqiFromDistance(latitude, longitude);
     } catch (e) {
       print('Error getting location: $e');
     }

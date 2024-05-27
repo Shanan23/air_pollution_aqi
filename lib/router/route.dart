@@ -30,6 +30,8 @@ final List<GetPage> routeApp = [
       page: () => SplashScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut<MapController>(() => MapController());
+        Get.lazyPut<HomeController>(() => HomeController());
+        Get.lazyPut<AqiController>(() => AqiController());
       })),
   GetPage(
     name: RouteName.home,
@@ -68,6 +70,8 @@ final List<GetPage> routeApp = [
     page: () => MapsScreen(),
     binding: BindingsBuilder(() {
       Get.lazyPut<MapsController>(() => MapsController());
+      Get.lazyPut<HomeController>(() => HomeController());
+      Get.lazyPut<AqiController>(() => AqiController());
     }),
   ),
   GetPage(

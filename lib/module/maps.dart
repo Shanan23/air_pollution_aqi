@@ -16,16 +16,16 @@ class MapsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    mapController.getLocation();
+    // mapController.getLocation();
 
     return Scaffold(
-      body: Obx(
-        () => Stack(
-          children: [
-            FlutterMap(
-              options: const MapOptions(
-                initialCenter: const LatLng(-6.211544, 106.845172),
-                initialZoom: 13.0,
+      body: Stack(
+        children: [
+          Obx(
+            () => FlutterMap(
+              options: MapOptions(
+                initialCenter: mapController.selectedLatLong.value,
+                initialZoom: 8.0,
               ),
               children: [
                 TileLayer(
@@ -37,7 +37,7 @@ class MapsScreen extends StatelessWidget {
                     Marker(
                       width: 30.0,
                       height: 30.0,
-                      point: mapController.getCurrentLocation(),
+                      point: mapController.selectedLatLong.value,
                       child: Container(
                         child: const Icon(
                           Icons.my_location,
@@ -294,60 +294,66 @@ class MapsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: <Widget>[
-                  searchTextField = AutoCompleteTextField<String>(
-                    key: key,
-                    suggestions: mapController.suggestions,
-                    decoration: const InputDecoration(
-                      hintText: "Type a city",
-                      labelText: "Search",
-                      filled: true,
-                      fillColor: Colors.white, // Background color
-                      border: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Colors.black), // Border color
-                      ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: <Widget>[
+                searchTextField = AutoCompleteTextField<String>(
+                  key: key,
+                  suggestions: mapController.suggestions,
+                  decoration: const InputDecoration(
+                    hintText: "Type a city",
+                    labelText: "Search",
+                    filled: true,
+                    fillColor: Colors.white, // Background color
+                    border: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.black), // Border color
                     ),
-                    itemFilter: (item, query) {
-                      return item.toLowerCase().contains(query.toLowerCase());
-                    },
-                    itemSorter: (a, b) {
-                      return a.compareTo(b);
-                    },
-                    textSubmitted: (data) {
-                      print("submited : $data");
-                      var index = mapController.suggestions.indexOf(data);
-                      var objMap = mapController.allLocations[index];
-                      Get.toNamed(RouteName.aqi, arguments: objMap);
-                    },
-                    itemSubmitted: (item) {
-                      print("submited : $item");
-                      var index = mapController.suggestions.indexOf(item);
-                      var objMap = mapController.allLocations[index];
-                      Get.toNamed(RouteName.aqi, arguments: objMap);
-                    },
-                    submitOnSuggestionTap: true,
-                    itemBuilder: (context, item) {
-                      return Container(
-                        color: Colors.white, // Background color
-                        child: ListTile(
-                          title: Text(
-                            item,
-                            style: const TextStyle(
-                                color: Colors.black), // Text color
-                          ),
-                        ),
-                      );
-                    },
                   ),
-                ],
-              ),
+                  itemFilter: (item, query) {
+                    return item.toLowerCase().contains(query.toLowerCase());
+                  },
+                  itemSorter: (a, b) {
+                    return a.compareTo(b);
+                  },
+                  textSubmitted: (data) {
+                    print("submited : $data");
+                    var index = mapController.suggestions.indexOf(data);
+                    var objMap = mapController.allLocations[index];
+
+                    mapController.setSelectedLatLng(
+                        objMap.latitude, objMap.longitude);
+                    // Get.toNamed(RouteName.aqi, arguments: objMap);
+                  },
+                  itemSubmitted: (item) {
+                    print("submited : $item");
+                    var index = mapController.suggestions.indexOf(item);
+                    var objMap = mapController.allLocations[index];
+                    
+                    mapController.setSelectedLatLng(
+                        objMap.latitude, objMap.longitude);
+                    // Get.toNamed(RouteName.aqi, arguments: objMap);
+                  },
+                  submitOnSuggestionTap: true,
+                  itemBuilder: (context, item) {
+                    return Container(
+                      color: Colors.white, // Background color
+                      child: ListTile(
+                        title: Text(
+                          item,
+                          style: const TextStyle(
+                              color: Colors.black), // Text color
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: 1,
@@ -362,16 +368,16 @@ class MapsScreen extends StatelessWidget {
     // Handle navigation based on index
     switch (index) {
       case 0:
-        Get.offAndToNamed(RouteName.home);
+        Get.toNamed(RouteName.home);
         break;
       case 1:
-        Get.offAndToNamed(RouteName.maps);
+        Get.toNamed(RouteName.maps);
         break;
       case 2:
-        Get.offAndToNamed(RouteName.news);
+        Get.toNamed(RouteName.news);
         break;
       case 3:
-        Get.offAndToNamed(RouteName.about);
+        Get.toNamed(RouteName.about);
         break;
     }
   }

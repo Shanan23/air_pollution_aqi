@@ -13,7 +13,7 @@ import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
   final MapsController mapController = Get.find();
-  final HomeController homeController = Get.put(HomeController());
+  final HomeController homeController = Get.find();
   final AqiController aqiController = Get.find();
 
   @override
@@ -192,16 +192,16 @@ class HomeScreen extends StatelessWidget {
     // Handle navigation based on index
     switch (index) {
       case 0:
-        Get.offAndToNamed(RouteName.home);
+        Get.toNamed(RouteName.home);
         break;
       case 1:
-        Get.offAndToNamed(RouteName.maps);
+        Get.toNamed(RouteName.maps);
         break;
       case 2:
-        Get.offAndToNamed(RouteName.news);
+        Get.toNamed(RouteName.news);
         break;
       case 3:
-        Get.offAndToNamed(RouteName.about);
+        Get.toNamed(RouteName.about);
         break;
     }
   }
